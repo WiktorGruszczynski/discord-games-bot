@@ -20,10 +20,12 @@ module.exports = {
         const board = createBoard()
 
         var move = ["cross", "circle"][Math.round(Math.random())]
+        var symbols = {"cross": '❌', "circle": '⭕'}
+        var description = `<@${user.id}>❌ vs <@${user2.id}>⭕ \n\n${symbols[move]} **turn!**`
 
         const start_embed = new EmbedBuilder()
             .setTitle("TicTacToe")
-            .setDescription(`<@${user.id}> vs <@${user2.id}> \n<@${players[move].id}> **moves first!**`)
+            .setDescription(description)
             .setColor(0xd9a426)
 
         const initialMessage = await interaction.reply({components: board, embeds: [start_embed], fetchReply: true})
@@ -37,13 +39,13 @@ module.exports = {
                 {
                     if (move == "cross")
                     {
-                        symbol = "❌"
+                        var symbol = "❌"
                         move = "circle"
                         style = ButtonStyle.Danger
                     }
                     else
                     {
-                        symbol = "⭕"
+                        var symbol = "⭕"
                         move = "cross"
                         style = ButtonStyle.Primary
                     }
@@ -56,7 +58,9 @@ module.exports = {
                         .setLabel(symbol)
                         .setStyle(style)
 
-                    await interaction.update({components: board})
+
+                    var description = `<@${user.id}>❌ vs <@${user2.id}>⭕ \n\n${symbols[move]} **turn!**`
+                    await interaction.update({components: board, embeds: [start_embed.setDescription(description)]})
 
                     array = board.map(row => row.components.map(component=>component.data.label))
                     winner = checkWin()
@@ -75,12 +79,22 @@ module.exports = {
                 }
                 else
                 {
-                    await interaction.reply({content: "This box has been already clicked", ephemeral: true})
+                    const embed = new EmbedBuilder()
+                        .setTitle("TicTacToe")
+                        .setDescription("This tile has been already clicked!")
+                        .setColor(0xff0000)
+
+                    await interaction.reply({embeds: [embed], ephemeral: true})
                 }
             }
             else
             {
-                await interaction.reply({content: "It's not your turn!", ephemeral: true})
+                const embed = new EmbedBuilder()
+                    .setTitle("TicTacToe")
+                    .setDescription("It's not your turn!")
+                    .setColor(0xff0000)
+
+                await interaction.reply({embeds: [embed], ephemeral: true})
             }
         })
 
